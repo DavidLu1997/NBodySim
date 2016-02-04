@@ -2,6 +2,9 @@
 //Randomly generates and displays an N-Body system
 //Code from Nvidia's GPU Gems 3 Chapter 31
 
+#ifndef __CUDACC__
+#define __CUDACC__
+#endif
 #include "cuda_runtime_api.h"
 #include "cuda_runtime.h"
 #include "cuda.h"
