@@ -42,6 +42,7 @@ x64*/
 Resources*/
 *.csv
 *.zip
+*.pdb
 
 # Project specific files
 *.jpg

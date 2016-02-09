@@ -13,12 +13,31 @@
 
 #include <stdio.h>
 #include <cmath>
+#include <cstdlib>
+#include <ctime>
+
+//Gravitational constant
+#define G 1
 
 //N, number of bodies
 const unsigned int N = 100;
 
 //p, number of blocks
 const unsigned int p = 5;
+
+//Upper bounds for location
+const float upperX = 100.0;
+const float upperY = 100.0;
+const float upperZ = 100.0;
+
+//Lower bounds for location
+const float lowerX = -100.0;
+const float lowerY = -100.0;
+const float lowerZ = -100.0;
+
+//Mass bounds
+const float upperMass = 100.0;
+const float lowerMass = 1.0;
 
 //Interaction between two bodies
 //Integrate using leapfrog-Verlet integrator
@@ -49,9 +68,9 @@ __device__ float3 bobyBodyInteraction(float4 b1, float4 b2, float3 a1) {
 
 
 	//Calculate a
-	a1.x += d.x * s;
-	a1.y += d.y * s;
-	a1.z += d.z * s;
+	a1.x += d.x * s * G;
+	a1.y += d.y * s * G;
+	a1.z += d.z * s * G;
 	return a1;
 
 }
@@ -115,6 +134,26 @@ __global__ void calculate_forces(void *devX, void *devA) {
 
 int main()
 {
+	//Generate N random bodies with locations defined by bounds
+	float4 *s = new float4[N];
+	float3 *v = new float3[N];
+	float3 *a = new float3[N];
+
+	srand(time(NULL));
+	for (int i = 0; i < N; i++) {
+		s[i].x = ((float)rand() / RAND_MAX) * (upperX - lowerX);
+		s[i].y = ((float)rand() / RAND_MAX) * (upperY - lowerY);
+		s[i].z = ((float)rand() / RAND_MAX) * (upperZ - lowerZ);
+		s[i].w = ((float)rand() / RAND_MAX) * (upperMass - lowerMass);
+
+		//No initial velocity or acceleration 
+		v[i].x = 0;
+		v[i].y = 0;
+		v[i].z = 0;
+		a[i].x = 0;
+		a[i].y = 0;
+		a[i].z = 0;
+	}
 
     return 0;
 }
