@@ -3,6 +3,8 @@ Thumbs.db
 ehthumbs.db
 
 # Visual Studio files
+*.pdb
+vc120.pdb
 *.vcxproj
 *.vcxproj.filters
 [Bb]in
@@ -42,7 +44,7 @@ x64*/
 Resources*/
 *.csv
 *.zip
-*.pdb
+
 
 # Project specific files
 *.jpg

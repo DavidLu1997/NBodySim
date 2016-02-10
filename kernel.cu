@@ -15,9 +15,14 @@
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
+using namespace std;
 
 //Gravitational constant
 #define G 1
+
+//Time interval
+#define dx 0.001
 
 //N, number of bodies
 const unsigned int N = 100;
@@ -135,24 +140,48 @@ __global__ void calculate_forces(void *devX, void *devA) {
 int main()
 {
 	//Generate N random bodies with locations defined by bounds
-	float4 *s = new float4[N];
-	float3 *v = new float3[N];
-	float3 *a = new float3[N];
+	float4 *h_s = new float4[N];
+	float3 *h_v = new float3[N];
+	float3 *h_a = new float3[N];
 
 	srand(time(NULL));
 	for (int i = 0; i < N; i++) {
-		s[i].x = ((float)rand() / RAND_MAX) * (upperX - lowerX);
-		s[i].y = ((float)rand() / RAND_MAX) * (upperY - lowerY);
-		s[i].z = ((float)rand() / RAND_MAX) * (upperZ - lowerZ);
-		s[i].w = ((float)rand() / RAND_MAX) * (upperMass - lowerMass);
+		h_s[i].x = ((float)rand() / RAND_MAX) * (upperX - lowerX) + lowerX;
+		h_s[i].y = ((float)rand() / RAND_MAX) * (upperY - lowerY) + lowerY;
+		h_s[i].z = ((float)rand() / RAND_MAX) * (upperZ - lowerZ) + lowerZ;
+		h_s[i].w = ((float)rand() / RAND_MAX) * (upperMass - lowerMass) + lowerMass;
 
 		//No initial velocity or acceleration 
-		v[i].x = 0;
-		v[i].y = 0;
-		v[i].z = 0;
-		a[i].x = 0;
-		a[i].y = 0;
-		a[i].z = 0;
+		h_v[i].x = 0;
+		h_v[i].y = 0;
+		h_v[i].z = 0;
+		h_a[i].x = 0;
+		h_a[i].y = 0;
+		h_a[i].z = 0;
+	}
+
+	//Create memory on device
+	float4 *d_s;
+	cudaMalloc(&d_s, N * sizeof(float4));
+	float3 *d_v;
+	cudaMalloc(&d_v, N * sizeof(float3));
+	float3 *d_a;
+	cudaMalloc(&d_a, N * sizeof(float3));
+
+	//Copy memory to device
+	cudaMemcpy(d_s, h_s, N * sizeof(float4), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_v, h_v, N * sizeof(float3), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_a, h_a, N * sizeof(float3), cudaMemcpyHostToDevice);
+
+	//Calculate accelerations
+	calculate_forces <<<1, N>>>(d_s, d_a);
+
+	//Return accelerations
+	cudaMemcpy(h_a, d_a, N * sizeof(float3), cudaMemcpyDeviceToHost);
+
+	//Print accelerations
+	for (unsigned int i = 0; i < N; i++) {
+		cout << h_a[i].x << ", " << h_a[i].y << ", " << h_a[i].z << endl;
 	}
 
     return 0;
