@@ -140,9 +140,9 @@ __global__ void calculate_forces(void *devX, void *devA) {
 int main()
 {
 	//Generate N random bodies with locations defined by bounds
-	float4 *h_s = new float4[N];
-	float3 *h_v = new float3[N];
-	float3 *h_a = new float3[N];
+	float4 *h_s = (float4*)malloc(N * sizeof(float4));
+	float3 *h_v = (float3*)malloc(N * sizeof(float3));
+	float3 *h_a = (float3*)malloc(N * sizeof(float3));
 
 	srand(time(NULL));
 	for (int i = 0; i < N; i++) {
