@@ -146,10 +146,10 @@ int main()
 
 	srand(time(NULL));
 	for (int i = 0; i < N; i++) {
-		h_s[i].x = ((float)rand() / RAND_MAX) * (upperX - lowerX) + lowerX;
-		h_s[i].y = ((float)rand() / RAND_MAX) * (upperY - lowerY) + lowerY;
-		h_s[i].z = ((float)rand() / RAND_MAX) * (upperZ - lowerZ) + lowerZ;
-		h_s[i].w = ((float)rand() / RAND_MAX) * (upperMass - lowerMass) + lowerMass;
+		h_s[i].x = rand();
+		h_s[i].y = rand();
+		h_s[i].z = rand();
+		h_s[i].w = rand();
 
 		//No initial velocity or acceleration 
 		h_v[i].x = 0;
